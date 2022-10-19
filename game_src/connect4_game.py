@@ -69,6 +69,15 @@ class Connect4State(GameState):
                     diag.append(self.grid[j][i])
             yield diag
 
+    def _get_diag2(self) -> list[int]:
+        j = 0
+        for start in range(-3, self.width - 3):
+            diag = []
+            for i, j in zip(range(start, self.width), range(0, self.height)):
+                if 0 <= i < self.width and 0 <= j < self.height:
+                    diag.append(self.grid[j][i])
+            yield diag
+
     def check4(self) -> int:
         for p in range(1, 3):
             # check per row:
@@ -100,6 +109,16 @@ class Connect4State(GameState):
                             return p
                     else:
                         continue
+            for p in range(1, 3):
+                for col in self._get_diag2():
+                    per_col = 0
+                    for i in range(len(col)):
+                        if col[i] == p:
+                            per_col += 1
+                            if per_col == 4:
+                                return p
+                        else:
+                            continue
 
 
     def update(self, action: Connect4Action):
