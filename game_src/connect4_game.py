@@ -37,7 +37,7 @@ class Connect4State(GameState):
     def is_game_over(self):
         self.player_won = self.check4()
         if self.player_won is not None:
-            print(f"player {self.player_won} already won!")
+            print(f"player {self.player_won} won!")
             return True
 
     def next_actions(self) -> list[int]:
@@ -75,12 +75,13 @@ class Connect4State(GameState):
 
 
     def update(self, action: Connect4Action):
-        print(f"got action from player #{action.player_num} = {action.action}")
-        for i in range(0, self.height):
-            if self.grid[i][action.action] == 0:
-                self.grid[i][action.action] = action.player_num
-                self.is_game_over()
-                return
+        if action is not None:
+            print(f"got action from player #{action.player_num} = {action.action}")
+            for i in range(0, self.height):
+                if self.grid[i][action.action] == 0:
+                    self.grid[i][action.action] = action.player_num
+                    self.is_game_over()
+                    return
 
     def __str__(self) -> str:
         s =  f"{self.width} x {self.height} \n"
@@ -98,15 +99,16 @@ class KeyboardAgent(Agent):
 
     def get_action(self, state: Connect4State) -> Connect4Action:
         print(f"Available actions: {state.next_actions()}")
-        while True:
-            col = int(input())
-            print(f"got request {col} from {self.name}")
-            # зря переносил логику проверки в класс Action, 
-            # видимо будет проще проверить здесь
-            if col in state.next_actions():
-                action = Connect4Action(player_num=self.num, max_col=self.max_col)    
-                action.action = col
-                return action
+        if len(state.next_actions()) > 0:
+            while True:
+                col = int(input())
+                print(f"got request {col} from {self.name}")
+                # зря переносил логику проверки в класс Action, 
+                # видимо будет проще проверить здесь
+                if col in state.next_actions():
+                    action = Connect4Action(player_num=self.num, max_col=self.max_col)    
+                    action.action = col
+                    return action
 
 class Connect4Game(Game):
     def __init__(self,
