@@ -31,7 +31,7 @@ class Connect4State(GameState):
         self.player_won = None
         for i in range(height):
             self.grid.append([])
-            for j in range(width):
+            for _ in range(width):
                 self.grid[i].append(0)
 
     def is_game_over(self):
@@ -50,13 +50,17 @@ class Connect4State(GameState):
                 res.append(i)
         return res
 
+    def _get_rows(self) -> list[int]:
+        for r in self.grid:
+            yield r
+
     def check4(self) -> int:
         for p in range(1, 3):
             # check per row:
-            for i in range(self.height):
+            for row in self._get_rows():
                 per_row = 0
-                for j in range(self.width):
-                    if self.grid[i][j] == p:
+                for i in range(len(row)):
+                    if row[i] == p:
                         per_row += 1
                         if per_row == 4:
                             return p
@@ -72,6 +76,17 @@ class Connect4State(GameState):
                             return p
                     else:
                         continue
+            # check main diagonal:
+            # for i in range(3, self.width, 1):
+            #     per_col = 0
+            #     for j in range(self.height):
+            #         if i - j >= 0 and i - j <= self.width:
+            #             if self.grid[j][i - j] == p:
+            #                 per_col += 1
+            #                 if per_col == 4:
+            #                     return p
+            #             else:
+            #                 continue
 
 
     def update(self, action: Connect4Action):
