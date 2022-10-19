@@ -133,7 +133,15 @@ class Connect4State(GameState):
     def __str__(self) -> str:
         s =  f"{self.width} x {self.height} \n"
         for i in range(self.height - 1, -1, -1):
-            s += f"{self.grid[i]} \n"
+#            s += f"{self.grid[i]} \n"
+            s += "\n"
+            for j in range(self.width):
+                if self.grid[i][j] == 0:
+                    s += ". "
+                elif self.grid[i][j] == 1:
+                    s += "X "
+                elif self.grid[i][j] == 2:
+                    s += "O "
         return s 
 
 
@@ -148,7 +156,7 @@ class KeyboardAgent(Agent):
         print(f"Available actions: {state.next_actions()}")
         if len(state.next_actions()) > 0:
             while True:
-                col = int(input())
+                col = int(input(f"{self.name} >"))
                 print(f"got request {col} from {self.name}")
                 # зря переносил логику проверки в класс Action, 
                 # видимо будет проще проверить здесь
@@ -182,8 +190,8 @@ class Connect4Game(Game):
         
 
 if __name__ == "__main__":
-    agent1 = KeyboardAgent(name="agent1", num=1)
-    agent2 = KeyboardAgent(name="agent2", num=2)
+    agent1 = KeyboardAgent(name="Player #1", num=1)
+    agent2 = KeyboardAgent(name="Player #2", num=2)
     game = Connect4Game(agents=[agent1, agent2],
                         width=7,
                         height=6
