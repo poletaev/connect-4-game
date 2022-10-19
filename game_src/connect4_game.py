@@ -1,4 +1,5 @@
 
+from tabnanny import check
 from base_game import Game
 from base_states import GameAction, GameState
 from base_agent import Agent
@@ -27,23 +28,58 @@ class Connect4State(GameState):
         self.width = width
         self.height = height
         self.grid = []
+        self.player_won = None
         for i in range(height):
             self.grid.append([])
             for j in range(width):
                 self.grid[i].append(0)
 
+    def is_game_over(self):
+        self.player_won = self.check4()
+        if self.player_won is not None:
+            print(f"player {self.player_won} already won!")
+            return True
+
     def next_actions(self) -> list[int]:
+        if self.is_game_over():
+            return []
+
         res = []
         for i in range(self.width):
             if self.grid[self.height - 1][i] == 0:
                 res.append(i)
         return res
 
+    def check4(self) -> int:
+        for p in range(1, 3):
+            # check per row:
+            for i in range(self.height):
+                per_row = 0
+                for j in range(self.width):
+                    if self.grid[i][j] == p:
+                        per_row += 1
+                        if per_row == 4:
+                            return p
+                    else:
+                        continue
+            # check per column:
+            for i in range(self.width):
+                per_col = 0
+                for j in range(self.height):
+                    if self.grid[j][i] == p:
+                        per_col += 1
+                        if per_col == 4:
+                            return p
+                    else:
+                        continue
+
+
     def update(self, action: Connect4Action):
         print(f"got action from player #{action.player_num} = {action.action}")
         for i in range(0, self.height):
             if self.grid[i][action.action] == 0:
                 self.grid[i][action.action] = action.player_num
+                self.is_game_over()
                 return
 
     def __str__(self) -> str:
@@ -90,7 +126,7 @@ class Connect4Game(Game):
         return self.state.update(action)
 
     def is_game_over(self) -> bool:
-        return False
+        return self.state.is_game_over()
 
     def display_state(self) -> None:
         print(self.state)
