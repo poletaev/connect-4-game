@@ -3,7 +3,6 @@ from tabnanny import check
 from base_game import Game
 from base_states import GameAction, GameState
 from base_agent import Agent
-import numpy as np
 
 class Connect4Action(GameAction):
     def __init__(self, player_num: int, max_col:int =6) -> None:
@@ -54,6 +53,22 @@ class Connect4State(GameState):
         for r in self.grid:
             yield r
 
+    def _get_columns(self) -> list[int]:
+        for i in range(self.width):
+            col = []
+            for j in range(self.height):
+                col.append(self.grid[j][i])
+            yield col
+
+    def _get_diag(self) -> list[int]:
+        j = 0
+        for start in range(3, self.width + 3):
+            diag = []
+            for i, j in zip(range(start, -1, -1), range(0, self.height)):
+                if 0 <= i < self.width and 0 <= j < self.height:
+                    diag.append(self.grid[j][i])
+            yield diag
+
     def check4(self) -> int:
         for p in range(1, 3):
             # check per row:
@@ -67,26 +82,24 @@ class Connect4State(GameState):
                     else:
                         continue
             # check per column:
-            for i in range(self.width):
+            for col in self._get_columns():
                 per_col = 0
-                for j in range(self.height):
-                    if self.grid[j][i] == p:
+                for i in range(len(col)):
+                    if col[i] == p:
                         per_col += 1
                         if per_col == 4:
                             return p
                     else:
                         continue
-            # check main diagonal:
-            # for i in range(3, self.width, 1):
-            #     per_col = 0
-            #     for j in range(self.height):
-            #         if i - j >= 0 and i - j <= self.width:
-            #             if self.grid[j][i - j] == p:
-            #                 per_col += 1
-            #                 if per_col == 4:
-            #                     return p
-            #             else:
-            #                 continue
+            for col in self._get_diag():
+                per_col = 0
+                for i in range(len(col)):
+                    if col[i] == p:
+                        per_col += 1
+                        if per_col == 4:
+                            return p
+                    else:
+                        continue
 
 
     def update(self, action: Connect4Action):
