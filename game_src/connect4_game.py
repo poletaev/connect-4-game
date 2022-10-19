@@ -1,12 +1,11 @@
 
+from unicodedata import name
 from base_game import Game
 from base_states import GameAction, GameState
 from base_agent import Agent
 
 class Connect4Action(GameAction):
-    def __init__(self, col=0, max_col=6) -> None:
-        super().__init__()
-        self.action = col
+    def __init__(self, max_col=6) -> None:
         self.max_col = max_col
 
     @property
@@ -31,21 +30,27 @@ class Connect4State(GameState):
     def update(self, action: Connect4Action):
         return self
 
+    def __str__(self) -> str:
+        return f"{self.width} x {self.height}"
+
 
 class KeyboardAgent(Agent):
-    def __init__(self, max_col: int = 7) -> None:
+    def __init__(self, name: str, max_col: int = 7) -> None:
         super().__init__()
+        self.name = name
         self.max_col = max_col
 
     def get_action(self, state: Connect4State) -> Connect4Action:
         print(f"Available actions: {state.next_actions()}")
         while True:
             col = int(input())
-            print(f"got request: {col}")
+            print(f"got request {col} from {self.name}")
             # зря переносил логику проверки в класс Action, 
             # видимо будет проще проверить здесь
             if col in state.next_actions():
-                return Connect4Action(col=col, max_col=self.max_col)    
+                action = Connect4Action(max_col=self.max_col)    
+                action.action = col
+                return action
 
 class Connect4Game(Game):
     def __init__(self,
@@ -64,4 +69,18 @@ class Connect4Game(Game):
     def update_state(self, action) -> Connect4State:
         return self.state.update(action)
 
-    
+    def is_game_over(self) -> bool:
+        return False
+
+    def display_state(self) -> None:
+        print(self.state)
+        
+
+if __name__ == "__main__":
+    agent1 = KeyboardAgent(name="agent1")
+    agent2 = KeyboardAgent(name="agent2")
+    game = Connect4Game(agents=[agent1, agent2],
+                        width=7,
+                        height=6
+                       )
+    game.run()        
