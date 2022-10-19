@@ -85,7 +85,7 @@ class Connect4State(GameState):
 
     def __str__(self) -> str:
         s =  f"{self.width} x {self.height} \n"
-        for i in range(0, self.height):
+        for i in range(self.height - 1, -1, -1):
             s += f"{self.grid[i]} \n"
         return s 
 
