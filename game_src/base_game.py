@@ -1,11 +1,15 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
 
+from base_states import GameState
+from base_agent import Agent
+
 
 class Game(ABC):
-    def __init__(self, agents: list) -> None:
+    def __init__(self, agents: list[Agent]) -> None:
         super().__init__()
         self.agents = agents
+        self.state = None
 
     @abstractmethod
     def is_game_over(self) -> bool:
@@ -16,11 +20,11 @@ class Game(ABC):
         raise NotImplemented()
 
     @abstractmethod
-    def init_state(self):
+    def init_state(self) -> GameState:
         raise NotImplemented()
 
     @abstractmethod
-    def update_state(self, action):
+    def update_state(self, action) -> GameState:
         raise NotImplemented()
 
     def run(self):
